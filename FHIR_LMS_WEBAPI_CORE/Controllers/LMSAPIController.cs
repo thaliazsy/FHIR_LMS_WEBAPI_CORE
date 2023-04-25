@@ -1,4 +1,5 @@
 ﻿using FHIR_LMS_WEBAPI_CORE.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
@@ -74,7 +75,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
 
         [HttpPost("api/Login")]
         [Consumes("application/x-www-form-urlencoded")]
-        public IActionResult Login([FromForm] UserLoginData user)
+        public IActionResult Login([FromForm] IFormCollection user)
         {
             LoginModel loginModel = new LoginModel(_configuration);
 
@@ -83,14 +84,14 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
             JObject loginData = JObject.Parse(System.IO.File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "LoginData.json")));
 
             //Get Email
-            loginData["person"]["email"] = user.email;
+            loginData["person"]["email"] = user["email"].ToString();
 
             //Get Password
-            loginData["person"]["password"] = user.password;
+            loginData["person"]["password"] = user["password"].ToString();
 
             //Verify Email and Password
             loginData["errmsg"] = "Check Login Person failed.";
-            string param = "?identifier=" + user.email;
+            string param = "?identifier=" + user["email"].ToString();
             JObject result = HTTPrequest.getResource(fhirUrl, "Person", param, "", loginModel.Check, loginData);
 
             return Ok(result);
