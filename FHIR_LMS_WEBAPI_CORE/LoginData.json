@@ -1,0 +1,26 @@
+﻿{
+    "expirationDate": "",
+    "person": {
+        "id": "",
+        "identifier": "",
+        "name": ""
+    },
+    "patient": {
+        "id": ""
+    },
+    "schedule": {
+        "id": "",
+        "courseCode": "",
+        "maxParticipant": ""
+    },
+    "slot": {
+        "id": ""
+    },
+    "role": [],
+    "roleAccess": [],
+    "userSelectedRole": "",
+    "appointment": {
+        "id": ""
+    },
+    "errmsg": ""
+}

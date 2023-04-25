@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -36,7 +37,8 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
             }
 
             HTTPrequest HTTPrequest = new HTTPrequest();
-            JObject loginData = JObject.Parse(System.IO.File.ReadAllText(_configuration.GetValue<string>("LoginJSON")));
+            JObject loginData = JObject.Parse(System.IO.File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "LoginData.json")));
+            
 
             //Get Person ID
             string[] arg = user.personId.Split('/');
@@ -70,5 +72,28 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
             return  Ok(result);
         }
 
+        [HttpPost("api/Login")]
+        [Consumes("application/x-www-form-urlencoded")]
+        public IActionResult Login([FromForm] UserLoginData user)
+        {
+            LoginModel loginModel = new LoginModel(_configuration);
+
+            HTTPrequest HTTPrequest = new HTTPrequest();
+            var section = _configuration.GetSection("UserLoginJSON");
+            JObject loginData = JObject.Parse(System.IO.File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "LoginData.json")));
+
+            //Get Email
+            loginData["person"]["email"] = user.email;
+
+            //Get Password
+            loginData["person"]["password"] = user.password;
+
+            //Verify Email and Password
+            loginData["errmsg"] = "Check Login Person failed.";
+            string param = "?identifier=" + user.email;
+            JObject result = HTTPrequest.getResource(fhirUrl, "Person", param, "", loginModel.Check, loginData);
+
+            return Ok(result);
+        }
     }
 }
