@@ -38,7 +38,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
 
             HTTPrequest HTTPrequest = new HTTPrequest();
             JObject loginData = JObject.Parse(System.IO.File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "LoginData.json")));
-            
+
 
             //Get Person ID
             string[] arg = user.personId.Split('/');
@@ -69,7 +69,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
             string param = '/' + loginData["person"]["id"].ToString();
             JObject result = HTTPrequest.getResource(fhirUrl, "Person", param, token, selectCourse.GetUserRole, loginData);
 
-            return  Ok(result);
+            return Ok(result);
         }
 
         [HttpPost("api/Login")]

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers.Text;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -45,8 +46,9 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
                             loginData["person"]["name"] = personUser["name"][0]["text"] != null ? personUser["name"][0]["text"] : "";
                             loginData["person"]["email"] = personUser["identifier"][0] != null ? personUser["identifier"][0]["value"] : "";
 
+                            result.Roles = GetRoles(personUser, loginData);
+
                             result.Message = "Login success.";
-                            result.token = "123";
                             return result;
                         }
                     }
@@ -55,5 +57,42 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
             result.Message = "Incorrect email or password.";
             return result;
         }
+
+        private JArray GetRoles(JObject personUser, JObject loginData)
+        {
+            dynamic result = new JObject();
+
+            //Get Roles
+            JArray roles = new JArray();
+
+            foreach (JObject role in (JArray)personUser["link"])
+            {
+                //Get Patient Roles
+                if (role["target"]["reference"].ToString().StartsWith("Patient/"))
+                {
+                    roles.Add(role["target"]["reference"].ToString());
+                }
+                //Get Practitioner Roles
+                else if (role["target"]["reference"].ToString().StartsWith("Practitioner/"))
+                {
+                    string practitionerID = role["target"]["reference"].ToString().Substring(13);
+
+                    HTTPrequest HTTPrequest = new HTTPrequest();
+                    string param = "?practitioner=" + practitionerID;
+                    JObject res = HTTPrequest.getResource(fhirUrl, "PractitionerRole", param, null, null, loginData);
+                    int total = res["total"].Value<int>();
+
+                    JArray pracRoles = (JArray)res["entry"];
+
+                    for (int i = 0; i < total; i++)
+                    {
+                        roles.Add(String.Concat("PractitionerRole/", pracRoles[i]["resource"]["id"].ToString()));
+                    }
+                }
+            }
+
+            return roles;
+        }
+
     }
 }

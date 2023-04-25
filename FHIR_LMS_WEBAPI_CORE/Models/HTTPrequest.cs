@@ -38,15 +38,21 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
                             return errmsg;
                         }
 
-                        JObject callbackResult = CallbackFunction(resultJson, loginData, token);
-                        return callbackResult;
+                        if (CallbackFunction == null)
+                        {
+                            return resultJson;
+                        }
+                        else
+                        {
+                            return CallbackFunction(resultJson, loginData, token);
+                        }
 
                     }
                 }
             }
             catch (Exception e)
             {
-                errmsg.Message = loginData["errmsg"]+"\n"+e.Message;
+                errmsg.Message = loginData["errmsg"] + "\n" + e.Message;
                 return errmsg;
             }
             errmsg.Message = loginData["errmsg"];
