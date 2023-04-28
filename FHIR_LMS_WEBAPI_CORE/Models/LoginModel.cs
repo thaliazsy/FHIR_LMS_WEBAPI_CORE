@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Buffers.Text;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
@@ -60,33 +61,54 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
 
         private JArray GetRoles(JObject personUser, JObject loginData)
         {
-            dynamic result = new JObject();
+            
 
             //Get Roles
             JArray roles = new JArray();
 
             foreach (JObject role in (JArray)personUser["link"])
             {
+                string roleID = role["target"]["reference"].ToString().Split('/')[1];
+                JObject userRole = JObject.Parse(System.IO.File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "Role.json")));
+                loginData["errmsg"] = "Error fetching user roles.";
+
                 //Get Patient Roles
                 if (role["target"]["reference"].ToString().StartsWith("Patient/"))
                 {
-                    roles.Add(role["target"]["reference"].ToString());
+                    JObject res = HTTPrequest.getResource(fhirUrl, "Patient", "/" + roleID, "", null, loginData);
+
+                    userRole["roleName"] = res["resourceType"];
+                    userRole["roleID"] = res["id"];
+                    userRole["practRoleID"] = "";
+                    userRole["organizationID"] = res["managingOrganization"]["reference"].ToString().Split('/')[1];
+                    userRole["organizationName"] = res["managingOrganization"]["display"];
+
+                    roles.Add(userRole);
                 }
                 //Get Practitioner Roles
                 else if (role["target"]["reference"].ToString().StartsWith("Practitioner/"))
                 {
                     string practitionerID = role["target"]["reference"].ToString().Substring(13);
 
-                    HTTPrequest HTTPrequest = new HTTPrequest();
                     string param = "?practitioner=" + practitionerID;
                     JObject res = HTTPrequest.getResource(fhirUrl, "PractitionerRole", param, null, null, loginData);
-                    int total = res["total"].Value<int>();
 
                     JArray pracRoles = (JArray)res["entry"];
 
-                    for (int i = 0; i < total; i++)
+                    foreach (JObject pracRole in pracRoles)
                     {
-                        roles.Add(String.Concat("PractitionerRole/", pracRoles[i]["resource"]["id"].ToString()));
+                        userRole["roleName"] = pracRole["resource"]["practitioner"]["reference"].ToString().Split('/')[0];
+                        userRole["roleID"] = pracRole["resource"]["practitioner"]["reference"].ToString().Split('/')[1];
+                        userRole["practRoleID"] = pracRole["resource"]["id"];
+                        userRole["organizationID"] = pracRole["resource"]["organization"]["reference"].ToString().Split('/')[1];
+                        userRole["organizationName"] = pracRole["resource"]["organization"]["display"];
+
+                        foreach (JObject coding in pracRole["resource"]["code"][0]["coding"])
+                        {
+                            userRole["roleCode"].ToList().Add(coding["code"]);
+                        }
+
+                        roles.Add(userRole);
                     }
                 }
             }
