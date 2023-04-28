@@ -15,11 +15,15 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly string fhirUrl;
+        private JObject loginData;
+        private HTTPrequest HTTPrequest = new HTTPrequest();
         public LMSAPIController(IConfiguration configuration)
         {
             _configuration = configuration;
             fhirUrl = _configuration.GetValue<string>("TZFHIR_Url");
+            loginData = JObject.Parse(System.IO.File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "JSON/LoginData.json")));
         }
+
         //public IActionResult Index()
         //{
         //    return View();
@@ -29,6 +33,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
         public IActionResult SelectCourse([FromBody] UserLogin user)
         {
             SelectCourse selectCourse = new SelectCourse(_configuration);
+
             var headers = Request.Headers;
             headers.TryGetValue("Authorization", out var headerValue);
             string token = headerValue.ToString();
@@ -36,10 +41,6 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
             {
                 return Unauthorized();
             }
-
-            HTTPrequest HTTPrequest = new HTTPrequest();
-            JObject loginData = JObject.Parse(System.IO.File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "LoginData.json")));
-
 
             //Get Person ID
             string[] arg = user.personId.Split('/');
@@ -78,10 +79,6 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
         public IActionResult Login([FromForm] IFormCollection user)
         {
             LoginModel loginModel = new LoginModel(_configuration);
-
-            HTTPrequest HTTPrequest = new HTTPrequest();
-            var section = _configuration.GetSection("UserLoginJSON");
-            JObject loginData = JObject.Parse(System.IO.File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "LoginData.json")));
 
             //Get Email
             loginData["person"]["email"] = user["email"].ToString();

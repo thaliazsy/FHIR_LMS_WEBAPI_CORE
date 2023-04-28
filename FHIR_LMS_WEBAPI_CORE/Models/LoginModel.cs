@@ -69,7 +69,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
             foreach (JObject role in (JArray)personUser["link"])
             {
                 string roleID = role["target"]["reference"].ToString().Split('/')[1];
-                JObject userRole = JObject.Parse(System.IO.File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "Role.json")));
+                JObject userRole = JObject.Parse(System.IO.File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "JSON/Role.json")));
                 loginData["errmsg"] = "Error fetching user roles.";
 
                 //Get Patient Roles

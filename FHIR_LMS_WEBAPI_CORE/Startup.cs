@@ -49,7 +49,6 @@ namespace FHIR_LMS_WEBAPI_CORE
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI();
-                app.UseCors("CorsPolicy");
             }
             else
             {
@@ -57,6 +56,7 @@ namespace FHIR_LMS_WEBAPI_CORE
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            app.UseCors("CorsPolicy");
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
