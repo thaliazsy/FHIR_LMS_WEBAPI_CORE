@@ -79,7 +79,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
 
                     userRole["roleName"] = res["resourceType"];
                     userRole["roleID"] = res["id"];
-                    userRole["practRoleID"] = "";
+                    userRole["practID"] = "";
                     userRole["organizationID"] = res["managingOrganization"]["reference"].ToString().Split('/')[1];
                     userRole["organizationName"] = res["managingOrganization"]["display"];
 
@@ -97,9 +97,9 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
 
                     foreach (JObject pracRole in pracRoles)
                     {
-                        userRole["roleName"] = pracRole["resource"]["practitioner"]["reference"].ToString().Split('/')[0];
-                        userRole["roleID"] = pracRole["resource"]["practitioner"]["reference"].ToString().Split('/')[1];
-                        userRole["practRoleID"] = pracRole["resource"]["id"];
+                        userRole["roleName"] = pracRole["resource"]["resourceType"];
+                        userRole["roleID"] = pracRole["resource"]["id"];
+                        userRole["practID"] = pracRole["resource"]["practitioner"]["reference"].ToString().Split('/')[1];
                         userRole["organizationID"] = pracRole["resource"]["organization"]["reference"].ToString().Split('/')[1];
                         userRole["organizationName"] = pracRole["resource"]["organization"]["display"];
 
