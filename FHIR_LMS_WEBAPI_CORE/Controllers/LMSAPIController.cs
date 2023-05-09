@@ -97,7 +97,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
         [HttpPost("api/jwt")]
         public IActionResult JWT([FromBody] JObject data)
         {
-            string d = Newtonsoft.Json.JsonConvert.SerializeObject(data["selectedDocRef"]);
+            //string d = Newtonsoft.Json.JsonConvert.SerializeObject(data["selectedDocRef"]);
             dynamic docRef = data["selectedDocRef"];
 
             string docUrl = (docRef["resource"]["content"] != null) ? docRef["resource"]["content"][0]["attachment"]["url"].ToString() : "";
@@ -107,7 +107,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
 
             // Audience (who or what the token is intended for)
             int idx = docUrl.IndexOf("fhir/");
-            string _aud = docUrl[..(idx + 5)];
+            string _aud = docUrl[..idx];
 
             string userRole = _aud + data["userSelectedRole"].ToString();
             string author = (docRef["resource"]["author"] != null) ? docRef["resource"]["author"][0]["reference"].ToString() : "";
@@ -141,9 +141,22 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
             //Generate Access Token for FHIR Document & its content
             string allToken = JWTModel.GenerateAccessToken(_aud, userRole, endpoints.ToArray());
 
+            JObject retData = new JObject();
+            retData["docURL"] = docUrl;
+            
+            if (data["viewer"].ToString() == "skinlesion.report.document")
+            {
+                retData["viewerURL"] = "http://203.64.84.32:9876/viewer";
+            }
+            else
+            {
+                retData["viewerURL"] = "";
+            }
 
-            //Return to client ("Authorization" Header)
-            return Ok(allToken);
+            retData["accessToken"] = allToken;
+
+            //Return to viewer URL and access token to client
+            return Ok(retData);
         }
     }
 }
