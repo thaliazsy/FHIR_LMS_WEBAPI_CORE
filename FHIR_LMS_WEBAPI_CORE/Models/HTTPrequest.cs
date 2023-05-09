@@ -31,11 +31,15 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
                         var result = streamReader.ReadToEnd();
                         JObject resultJson = JObject.Parse(result);
 
-                        if (resultJson["resourceType"].ToString() == "Bundle" && (int)resultJson["total"] <= 0)
+                        if (resultJson["resourceType"].ToString() == "Bundle")
                         {
-                            errmsg.total = 0;
-                            errmsg.Message = ResourceName + " does not exist.";
-                            return errmsg;
+                            string type = resultJson["type"].ToString();
+                            if (type == "searchset" && (int)resultJson["total"] <= 0)
+                            {
+                                errmsg.total = 0;
+                                errmsg.Message = ResourceName + " does not exist.";
+                                return errmsg;
+                            }
                         }
 
                         if (CallbackFunction == null)

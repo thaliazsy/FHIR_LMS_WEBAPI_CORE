@@ -93,5 +93,57 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
 
             return Ok(result);
         }
+
+        [HttpPost("api/jwt")]
+        public IActionResult JWT([FromBody] JObject data)
+        {
+            string d = Newtonsoft.Json.JsonConvert.SerializeObject(data["selectedDocRef"]);
+            dynamic docRef = data["selectedDocRef"];
+
+            string docUrl = (docRef["resource"]["content"] != null) ? docRef["resource"]["content"][0]["attachment"]["url"].ToString() : "";
+
+            List<string> endpoints = new List<string>();
+            endpoints.Add(docUrl);
+
+            // Audience (who or what the token is intended for)
+            int idx = docUrl.IndexOf("fhir/");
+            string _aud = docUrl[..(idx + 5)];
+
+            string userRole = _aud + data["userSelectedRole"].ToString();
+            string author = (docRef["resource"]["author"] != null) ? docRef["resource"]["author"][0]["reference"].ToString() : "";
+
+
+            JWTModel jwtModel = new JWTModel(_configuration);
+            //Verify ID Token ("Authorization" Header)
+
+            //Check FHIR Consent (if author != oneself)
+            if (userRole != author)
+            {
+
+            }
+
+            // Generate Access Token for FHIR Document
+            string docToken = JWTModel.GenerateAccessToken(_aud, userRole, docUrl);
+
+            // Get FHIR Document
+            JObject result = HTTPrequest.getResource(docUrl, "", "", docToken, null, loginData);
+
+            JObject composition = (JObject)result["entry"][0]["resource"];
+
+            if (composition["resourceType"].ToString() == "Composition")
+            {
+                foreach (JObject entry in composition["section"][0]["entry"])
+                {
+                    endpoints.Add(_aud + entry["reference"].ToString());
+                }
+            }
+
+            //Generate Access Token for FHIR Document & its content
+            string allToken = JWTModel.GenerateAccessToken(_aud, userRole, endpoints.ToArray());
+
+
+            //Return to client ("Authorization" Header)
+            return Ok(allToken);
+        }
     }
 }
