@@ -128,6 +128,12 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
             // Get FHIR Document
             JObject result = HTTPrequest.getResource(docUrl, "", "", docToken, null, loginData);
 
+            if (result["Message"] != null)
+            {
+                //Return to viewer URL and access token to client
+                return StatusCode(StatusCodes.Status500InternalServerError, result);
+            }
+
             JObject composition = (JObject)result["entry"][0]["resource"];
 
             if (composition["resourceType"].ToString() == "Composition")
@@ -151,6 +157,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
             else
             {
                 retData["viewerURL"] = "";
+                return BadRequest("Viewer not available.");
             }
 
             retData["accessToken"] = allToken;

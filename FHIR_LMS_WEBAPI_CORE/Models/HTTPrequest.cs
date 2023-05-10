@@ -41,6 +41,14 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
                                 return errmsg;
                             }
                         }
+                        else if (resultJson["resourceType"].ToString() == "OperationOutcome")
+                        {
+                            foreach (JObject issue in resultJson["issue"])
+                            {
+                                errmsg.Message += issue["diagnostics"]+ "\n";
+                            }
+                                return errmsg;
+                        }
 
                         if (CallbackFunction == null)
                         {
