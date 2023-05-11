@@ -133,14 +133,22 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
                 //Return to viewer URL and access token to client
                 return StatusCode(StatusCodes.Status500InternalServerError, result);
             }
-
-            JObject composition = (JObject)result["entry"][0]["resource"];
-
-            if (composition["resourceType"].ToString() == "Composition")
+            if (result["entry"]==null || result["entry"][0]["resource"]==null)
             {
-                foreach (JObject entry in composition["section"][0]["entry"])
+                //Return to viewer URL and access token to client
+                return StatusCode(StatusCodes.Status500InternalServerError, "No document entry available.");
+            }
+
+            foreach (JObject entry in result["entry"])
+            {
+                if (entry["resource"]["resourceType"].ToString() == "Composition")
                 {
-                    endpoints.Add(_aud + entry["reference"].ToString());
+                    JObject composition = (JObject)entry["resource"];
+                    foreach (JObject e in composition["section"][0]["entry"])
+                    {
+                        endpoints.Add(_aud + e["reference"].ToString());
+                    }
+                    break;
                 }
             }
 
@@ -149,8 +157,12 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
 
             JObject retData = new JObject();
             retData["docURL"] = docUrl;
-            
+
             if (data["viewer"].ToString() == "skinlesion.report.document")
+            {
+                retData["viewerURL"] = "http://203.64.84.32:9876/viewer";
+            }
+            else if (data["viewer"].ToString() == "skinlesion.image.document")
             {
                 retData["viewerURL"] = "http://203.64.84.32:9876/viewer";
             }
@@ -163,6 +175,8 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
             retData["accessToken"] = allToken;
 
             //Return to viewer URL and access token to client
+            //string redirectUrl = "http://203.64.84.32:9876/viewer?wantedDoc=" + docUrl;
+            //return RedirectPermanent(redirectUrl);
             return Ok(retData);
         }
     }
