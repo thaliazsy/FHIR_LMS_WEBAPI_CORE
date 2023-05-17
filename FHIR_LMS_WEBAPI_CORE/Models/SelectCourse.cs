@@ -53,7 +53,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
                         result = HTTPrequest.getResource(fhirUrl, "Patient", param, token, GetSchedule, loginData);
                         return result;
                     }
-                    result["Message"] = "Patient does not belong to this Person.";
+                    result["message"] = "Patient does not belong to this Person.";
                 }
             }
             return result;
@@ -147,7 +147,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
                 return result;
             }
             //Alert maximum course
-            result["Message"] = "This course has reached its maximum capacity. " +
+            result["message"] = "This course has reached its maximum capacity. " +
                 "We have added your name into the waiting list." +
                 "You'll be able to see the course material once approved by admin.";
             return result;
@@ -181,7 +181,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
 
             }
             //Alert maximum course
-            result["Message"] = "This course has reached its maximum capacity. " +
+            result["message"] = "This course has reached its maximum capacity. " +
                 "We have added your name into the waiting list." +
                 "You'll be able to see the course material once approved by admin.";
             return result;

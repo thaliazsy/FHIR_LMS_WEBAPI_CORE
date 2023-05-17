@@ -37,7 +37,8 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
                             if (type == "searchset" && (int)resultJson["total"] <= 0)
                             {
                                 errmsg.total = 0;
-                                errmsg.Message = ResourceName + " does not exist.";
+                                errmsg.message = ResourceName + " does not exist.";
+                                errmsg.code = 404;
                                 return errmsg;
                             }
                         }
@@ -45,7 +46,8 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
                         {
                             foreach (JObject issue in resultJson["issue"])
                             {
-                                errmsg.Message += issue["diagnostics"]+ "\n";
+                                errmsg.message += issue["diagnostics"]+ "\n";
+                                errmsg.code = 404;
                             }
                                 return errmsg;
                         }
@@ -64,10 +66,10 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
             }
             catch (Exception e)
             {
-                errmsg.Message = loginData["errmsg"] + "\n" + e.Message;
+                errmsg.message = loginData["errmsg"] + "\n" + e.Message;
                 return errmsg;
             }
-            errmsg.Message = loginData["errmsg"];
+            errmsg.message = loginData["errmsg"];
             return errmsg;
         }
 
@@ -105,10 +107,10 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
             }
             catch (Exception e)
             {
-                errmsg.Message = loginData["errmsg"] + "\n" + e.Message;
+                errmsg.message = loginData["errmsg"] + "\n" + e.Message;
                 return errmsg;
             }
-            errmsg.Message = loginData["errmsg"];
+            errmsg.message = loginData["errmsg"];
             return errmsg;
         }
 
@@ -150,10 +152,10 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
             }
             catch (Exception e)
             {
-                errmsg.Message = loginData["errmsg"] + "\n" + e.Message;
+                errmsg.message = loginData["errmsg"] + "\n" + e.Message;
                 return errmsg;
             }
-            errmsg.Message = loginData["errmsg"];
+            errmsg.message = loginData["errmsg"];
             return errmsg;
         }
     }

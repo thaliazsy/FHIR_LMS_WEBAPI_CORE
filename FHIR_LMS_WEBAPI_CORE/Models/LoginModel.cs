@@ -47,22 +47,20 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
                             loginData["person"]["name"] = personUser["name"][0]["text"] != null ? personUser["name"][0]["text"] : "";
                             loginData["person"]["email"] = personUser["identifier"][0] != null ? personUser["identifier"][0]["value"] : "";
 
-                            result.Roles = GetRoles(personUser, loginData);
+                            result.roles = GetRoles(personUser, loginData);
 
-                            result.Message = "Login success.";
+                            result.code = 200;
                             return result;
                         }
                     }
                 }
             }
-            result.Message = "Incorrect email or password.";
+            result.code = 401;
             return result;
         }
 
         private JArray GetRoles(JObject personUser, JObject loginData)
         {
-            
-
             //Get Roles
             JArray roles = new JArray();
 

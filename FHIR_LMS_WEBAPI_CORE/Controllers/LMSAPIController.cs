@@ -29,7 +29,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
         //    return View();
         //}
 
-        [HttpPost("api/SelectCourse")]
+        [HttpPost("api/select-course")]
         public IActionResult SelectCourse([FromBody] UserLogin user)
         {
             SelectCourse selectCourse = new SelectCourse(_configuration);
@@ -74,7 +74,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
             return Ok(result);
         }
 
-        [HttpPost("api/Login")]
+        [HttpPost("api/login")]
         [Consumes("application/x-www-form-urlencoded")]
         public IActionResult Login([FromForm] IFormCollection user)
         {
@@ -90,7 +90,10 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
             loginData["errmsg"] = "Check Login Person failed.";
             string param = "?identifier=" + user["email"].ToString();
             JObject result = HTTPrequest.getResource(fhirUrl, "Person", param, "", loginModel.Check, loginData);
-
+            if ((int)result["code"] != 200)
+            {
+                return Ok("Incorrect email or password.");
+            }
             return Ok(result);
         }
 
@@ -128,7 +131,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
             // Get FHIR Document
             JObject result = HTTPrequest.getResource(docUrl, "", "", docToken, null, loginData);
 
-            if (result["Message"] != null)
+            if (result["message"] != null)
             {
                 //Return to viewer URL and access token to client
                 return StatusCode(StatusCodes.Status500InternalServerError, result);
