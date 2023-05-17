@@ -123,7 +123,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
             }
 
             // Generate Access Token for FHIR Document
-            string docToken = JWTModel.GenerateAccessToken(_aud, userRole, docUrl);
+            string docToken = jwtModel.GenerateAccessToken(_aud, userRole, docUrl);
 
             // Get FHIR Document
             JObject result = HTTPrequest.getResource(docUrl, "", "", docToken, null, loginData);
@@ -138,7 +138,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
                 //Return to viewer URL and access token to client
                 return StatusCode(StatusCodes.Status500InternalServerError, "No document entry available.");
             }
-
+            
             foreach (JObject entry in result["entry"])
             {
                 if (entry["resource"]["resourceType"].ToString() == "Composition")
@@ -153,18 +153,19 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
             }
 
             //Generate Access Token for FHIR Document & its content
-            string allToken = JWTModel.GenerateAccessToken(_aud, userRole, endpoints.ToArray());
+            string allToken = jwtModel.GenerateAccessToken(_aud, userRole, endpoints.ToArray());
 
             JObject retData = new JObject();
             retData["docURL"] = docUrl;
 
             if (data["viewer"].ToString() == "skinlesion.report.document")
             {
-                retData["viewerURL"] = "http://203.64.84.32:9876/viewer";
+                retData["viewerURL"] = "http://203.64.84.32:9876/viewer/skin-lesion-viewer";
             }
             else if (data["viewer"].ToString() == "skinlesion.image.document")
             {
-                retData["viewerURL"] = "http://203.64.84.32:9876/viewer";
+                retData["viewerURL"] = "http://203.64.84.32:9876/ReportCreator?documentbundle=" + docUrl;
+                //http://203.64.84.32:9876/ReportCreator?documentbundle=http://203.64.84.32:9876/fhir/Bundle/688
             }
             else
             {
