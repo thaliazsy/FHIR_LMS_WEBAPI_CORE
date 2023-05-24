@@ -167,7 +167,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
             }
             else if (data["viewer"].ToString() == "skinlesion.image.document")
             {
-                retData["viewerURL"] = "http://203.64.84.32:9876/ReportCreator?documentbundle=" + docUrl;
+                retData["viewerURL"] = "http://203.64.84.32:9876/skinlesionimage-ms/ReportCreator?documentbundle=" + docUrl;
                 //http://203.64.84.32:9876/ReportCreator?documentbundle=http://203.64.84.32:9876/fhir/Bundle/688
             }
             else
