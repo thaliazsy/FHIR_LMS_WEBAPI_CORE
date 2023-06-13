@@ -100,8 +100,15 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
                     {
                         var result = streamReader.ReadToEnd();
                         JObject resultJson = JObject.Parse(result);
-                        JObject callbackResult = CallbackFunction(resultJson, loginData, token);
-                        return callbackResult;
+
+                        if (CallbackFunction == null)
+                        {
+                            return resultJson;
+                        }
+                        else
+                        {
+                            return CallbackFunction(resultJson, loginData, token);
+                        }
                     }
                 }
             }
