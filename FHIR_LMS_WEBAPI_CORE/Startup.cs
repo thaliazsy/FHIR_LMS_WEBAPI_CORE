@@ -39,6 +39,8 @@ namespace FHIR_LMS_WEBAPI_CORE
                             .AllowAnyHeader(); // allowing any header to be sent
                       });
             });
+
+            services.AddRouting(options => options.LowercaseUrls = true);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
