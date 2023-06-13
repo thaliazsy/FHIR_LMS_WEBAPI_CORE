@@ -97,6 +97,55 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
             return Ok(result);
         }
 
+        [HttpPost("api/register")]
+        public IActionResult Register([FromBody] JObject user)
+        {
+            RegisterModel registerModel = new RegisterModel(_configuration);
+
+            JObject person = (JObject)user["Person"];
+            JObject patient = (JObject)user["Patient"];
+
+            dynamic res = new JObject();
+
+            //Search Person
+            //Verify Email and Password
+            loginData["errmsg"] = "Check Register Person failed.";
+            string param = "?identifier=" + person["identifier"][0]["value"].ToString();
+            JObject result = HTTPrequest.getResource(fhirUrl, "Person", param, "", null, loginData);
+            if ((result["code"] != null && (int)result["code"] == 404) || ((string)result["resourceType"] == "Bundle" && (string)result["type"] == "searchset" && result["entry"]== null)) //Person not found
+            {
+                //Post Patient
+                JObject ret = HTTPrequest.postResource(fhirUrl, "Patient", patient, "", null, loginData);
+                if (ret["resourceType"] != null && ret["resourceType"].ToString() == "Patient")
+                {
+                    //Get Patient ID
+                    JArray patlink = JArray.Parse("[{\"target\": {\"reference\": \"Patient/" + ret["id"].ToString() + "\"}} ]");
+                    person.Add(new JProperty("link", patlink));
+
+                    //Store Patient ID
+                    res.patient = "Patient/" + ret["id"].ToString();
+
+
+                    ret = HTTPrequest.postResource(fhirUrl, "Person", person, "", null, loginData);
+
+                    if (ret["resourceType"] != null && ret["resourceType"].ToString() == "Person")
+                    {
+                        res.person = "Person/" + ret["id"].ToString();
+                        return Ok(res);
+                    }
+                }
+
+            }
+            else
+            {
+                res.msg = "Account exists.";
+
+                return Ok(res);
+            }
+
+            return Ok(res);
+        }
+
         [HttpPost("api/jwt")]
         public IActionResult JWT([FromBody] JObject data)
         {
