@@ -1,0 +1,14 @@
+﻿{
+  "apps": [
+    {
+      "name": "Daily Observations Upload 1",
+      "url": "http://203.64.84.32:9876/hello",
+      "imageSrc": "https://localhost:44327/images/job.png"
+    },
+    {
+      "name": "Daily Observations Upload 2",
+      "url": "http://203.64.84.32:9876/hello",
+      "imageSrc": "https://localhost:44327/images/job.png"
+    }
+  ]
+}

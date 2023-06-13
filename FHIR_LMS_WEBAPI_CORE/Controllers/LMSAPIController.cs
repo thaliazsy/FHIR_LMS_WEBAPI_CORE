@@ -21,7 +21,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
         {
             _configuration = configuration;
             fhirUrl = _configuration.GetValue<string>("TZFHIR_Url");
-            loginData = JObject.Parse(System.IO.File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "JSON/LoginData.json")));
+            loginData = JObject.Parse(System.IO.File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "Assets/JSON/LoginData.json")));
         }
 
         //public IActionResult Index()
@@ -136,12 +136,12 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
                 //Return to viewer URL and access token to client
                 return StatusCode(StatusCodes.Status500InternalServerError, result);
             }
-            if (result["entry"]==null || result["entry"][0]["resource"]==null)
+            if (result["entry"] == null || result["entry"][0]["resource"] == null)
             {
                 //Return to viewer URL and access token to client
                 return StatusCode(StatusCodes.Status500InternalServerError, "No document entry available.");
             }
-            
+
             foreach (JObject entry in result["entry"])
             {
                 if (entry["resource"]["resourceType"].ToString() == "Composition")

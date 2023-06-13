@@ -1,0 +1,14 @@
+﻿{
+  "apps": [
+    {
+      "name": "Skin Lesion Image Uploader 1",
+      "url": "http://203.64.84.32:9876/skinlesionimage-ms/Camera/Capture",
+      "imageSrc": "https://localhost:44327/images/camera.png"
+    },
+    {
+      "name": "Skin Lesion Image Uploader 2",
+      "url": "http://203.64.84.32:9876/skinlesionimage-ms/Camera/Capture",
+      "imageSrc": "https://localhost:44327/images/camera.png"
+    }
+  ]
+}
