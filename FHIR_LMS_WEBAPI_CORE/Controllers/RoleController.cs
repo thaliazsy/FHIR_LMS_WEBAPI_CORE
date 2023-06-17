@@ -31,15 +31,14 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
         public IActionResult MiniApps([FromQuery] string userRole)
         {
             // Get Role
-            string role = userRole != null ? userRole.Split('/')[0] : "";
-
+            
             JObject apps=null;
 
-            if (role == "PractitionerRole")
+            if (userRole == "PractitionerRole")
             {
                 apps = JObject.Parse(System.IO.File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "Assets/JSON/PractRole_Apps.json")));
             }
-            else if (role == "Patient")
+            else if (userRole == "Patient")
             {
                 apps = JObject.Parse(System.IO.File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "Assets/JSON/Patient_Apps.json")));
             }
