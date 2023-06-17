@@ -94,7 +94,27 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
             {
                 return Ok("Incorrect email or password.");
             }
-            return Ok(result);
+
+            // Add roles to loginData
+            loginData.Remove("errmsg");
+            loginData["roles"] = result["roles"];
+
+            return Ok(loginData);
+            /* {
+                "roles": [
+                {
+                    "roleName": "Patient",
+                    "roleID": "46179774-1a1e-4ae4-b626-9ff53fa080f4",
+                    "practRoleID": "",
+                    "roleIdentifier": "",
+                    "organizationID": "98a6f5c5-af58-41b5-bd6f-d8ca996b5580",
+                    "organizationName": "Tzu Chi Hospital",
+                    "roleCode": [],
+                    "practID": ""
+                }],
+                "code": 200
+                } 
+            */
         }
 
         [HttpPost("api/register")]
@@ -112,7 +132,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
             loginData["errmsg"] = "Check Register Person failed.";
             string param = "?identifier=" + person["identifier"][0]["value"].ToString();
             JObject result = HTTPrequest.getResource(fhirUrl, "Person", param, "", null, loginData);
-            if ((result["code"] != null && (int)result["code"] == 404) || ((string)result["resourceType"] == "Bundle" && (string)result["type"] == "searchset" && result["entry"]== null)) //Person not found
+            if ((result["code"] != null && (int)result["code"] == 404) || ((string)result["resourceType"] == "Bundle" && (string)result["type"] == "searchset" && result["entry"] == null)) //Person not found
             {
                 //Post Patient
                 JObject ret = HTTPrequest.postResource(fhirUrl, "Patient", patient, "", null, loginData);

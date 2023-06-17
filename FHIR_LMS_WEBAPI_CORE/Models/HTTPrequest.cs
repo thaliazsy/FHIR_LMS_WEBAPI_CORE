@@ -34,7 +34,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
                         if (resultJson["resourceType"].ToString() == "Bundle")
                         {
                             string type = resultJson["type"].ToString();
-                            if (type == "searchset" && (int)resultJson["total"] <= 0)
+                            if (type == "searchset" && (int)resultJson["total"] <= 0 && ResourceName!="Appointment")
                             {
                                 errmsg.total = 0;
                                 errmsg.message = ResourceName + " does not exist.";

@@ -79,7 +79,8 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
                     userRole["roleID"] = res["id"];
                     userRole["practID"] = "";
                     userRole["organizationID"] = res["managingOrganization"]["reference"].ToString().Split('/')[1];
-                    userRole["organizationName"] = res["managingOrganization"]["display"];
+                    userRole["organizationName"] = res["managingOrganization"]["display"] ?? res["managingOrganization"]["reference"];
+                    userRole["status"] = (bool)res["active"] ? "active":"";
 
                     roles.Add(userRole);
                 }
@@ -100,6 +101,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
                         userRole["practID"] = pracRole["resource"]["practitioner"]["reference"].ToString().Split('/')[1];
                         userRole["organizationID"] = pracRole["resource"]["organization"]["reference"].ToString().Split('/')[1];
                         userRole["organizationName"] = pracRole["resource"]["organization"]["display"];
+                        userRole["status"] = (bool)pracRole["resource"]["active"] ? "active" : "";
 
                         foreach (JObject coding in pracRole["resource"]["code"][0]["coding"])
                         {

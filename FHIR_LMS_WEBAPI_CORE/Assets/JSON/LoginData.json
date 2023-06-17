@@ -14,9 +14,12 @@
         "maxParticipant": ""
     },
     "slot": {
-        "id": ""
+      "id": []
     },
-    "role": [],
+  "organization": {
+    "name": ""
+  },
+    "roles": [],
     "roleAccess": [],
     "userSelectedRole": "",
     "appointment": {
