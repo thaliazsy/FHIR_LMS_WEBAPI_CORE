@@ -34,42 +34,32 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
         {
             SelectCourse selectCourse = new SelectCourse(_configuration);
 
-            var headers = Request.Headers;
-            headers.TryGetValue("Authorization", out var headerValue);
-            string token = headerValue.ToString();
-            if (token == null)
+            //var headers = Request.Headers;
+            //headers.TryGetValue("Authorization", out var headerValue);
+            //string token = headerValue.ToString();
+            string token = "123";
+            //if (token == null)
+            //{
+            //    return Unauthorized();
+            //}
+
+            // Get Person ID and Patient ID
+            if (user.personId == "" || user.patientId == "")
             {
-                return Unauthorized();
+                return BadRequest("Patient or Person ID not found.");
             }
 
-            //Get Person ID
-            string[] arg = user.personId.Split('/');
-            if (arg[0] == "Person" && arg.Length >= 2)
-            {
-                loginData["person"]["id"] = arg[1];
-            }
-            else
-            {
-                return BadRequest("PersonID not found.");
-            }
+            loginData["person"]["id"] = user.personId;
+            loginData["patient"]["id"] = user.patientId;
 
-            //Get Patient ID
-            arg = user.patientId.Split('/');
-            if (arg[0] == "Patient" && arg.Length >= 2)
-            {
-                loginData["patient"]["id"] = arg[1];
-            }
-            else
-            {
-                return BadRequest("PatientID not found.");
-            }
-
-            loginData["schedule"]["id"] = "860";
+            loginData["schedule"]["id"] = "4534";
 
             //Check Login Data (Person == Patient)
             loginData["errmsg"] = "Check Login Person failed.";
             string param = '/' + loginData["person"]["id"].ToString();
             JObject result = HTTPrequest.getResource(fhirUrl, "Person", param, token, selectCourse.GetUserRole, loginData);
+
+            result = HTTPrequest.getResource(fhirUrl, "Appointment", "?actor=Patient/" + user.patientId, token, null, loginData);
 
             return Ok(result);
         }

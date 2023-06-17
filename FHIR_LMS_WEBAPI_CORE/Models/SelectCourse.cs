@@ -24,7 +24,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
 
         public JObject GetUserRole(JObject personUser, JObject loginData, string token)
         {
-            
+
             JObject result = null;
             loginData["person"]["id"] = personUser["id"] != null ? personUser["id"] : "";
             loginData["person"]["name"] = personUser["name"][0]["text"] != null ? personUser["name"][0]["text"] : "";
@@ -87,7 +87,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
             loginData["slot"]["id"] = slot["entry"][0]["resource"]["id"];
 
             //Create Appointment Waitlist
-            JObject appointment = JObject.Parse(File.ReadAllText(_configuration.GetValue<string>("AppointmentJSON")));
+            JObject appointment = JObject.Parse(System.IO.File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "Assets/JSON/Appointment.json")));
             appointment["participant"][0]["actor"]["reference"] = "Patient/" + loginData["patient"]["id"];
             appointment["participant"][0]["actor"]["display"] = loginData["person"]["name"];
             appointment["slot"][0]["reference"] = "Slot/" + loginData["slot"]["id"];
@@ -96,6 +96,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
             //POST new Appointment
             loginData["errmsg"] = "Create Appointment failed.";
             JObject result = HTTPrequest.postResource(fhirUrl, "Appointment", appointment, token, GetGroupQuantity, loginData);
+            
             return result;
         }
 
@@ -124,6 +125,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
             loginData["errmsg"] = "GET booked Appointment failed.";
             string param = "?slot=" + loginData["slot"]["id"] + "&status=booked";
             JObject result = HTTPrequest.getResource(fhirUrl, "Appointment", param, token, GetWaitlistAppointment, loginData);
+
             return result;
 
         }
@@ -164,22 +166,25 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
             //diff = diff < waitlistQty ? diff : waitlistQty;
 
             string appointmentID = loginData["appointment"]["id"].ToString();
-
-            var entry = JArray.Parse(appSearch["entry"].ToString());
-            var requiredArticle = entry.First(a => a["resource"]["id"].ToString().Equals(appointmentID));
-            int index = entry.IndexOf(requiredArticle);
-
-            if (index != -1 && index < diff)
+            if (appSearch["entry"] != null)
             {
-                JObject new_appointment = (JObject)appSearch["entry"][index]["resource"];
-                new_appointment.Property("meta").Remove();
-                new_appointment["status"] = "booked";
+                var entry = JArray.Parse(appSearch["entry"].ToString());
+                var requiredArticle = entry.First(a => a["resource"]["id"].ToString().Equals(appointmentID));
+                int index = entry.IndexOf(requiredArticle);
 
-                string param = '/' + appointmentID;
-                result = HTTPrequest.putResource(fhirUrl, "Appointment" + param, new_appointment, token, null, loginData);
-                return result;
+                if (index != -1 && index < diff)
+                {
+                    JObject new_appointment = (JObject)appSearch["entry"][index]["resource"];
+                    new_appointment.Property("meta").Remove();
+                    new_appointment["status"] = "booked";
 
+                    string param = '/' + appointmentID;
+                    result = HTTPrequest.putResource(fhirUrl, "Appointment" + param, new_appointment, token, null, loginData);
+                    return result;
+
+                }
             }
+
             //Alert maximum course
             result["message"] = "This course has reached its maximum capacity. " +
                 "We have added your name into the waiting list." +
