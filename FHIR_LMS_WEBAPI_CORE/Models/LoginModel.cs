@@ -80,7 +80,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
                     userRole["practID"] = "";
                     userRole["organizationID"] = res["managingOrganization"]["reference"].ToString().Split('/')[1];
                     userRole["organizationName"] = res["managingOrganization"]["display"] ?? res["managingOrganization"]["reference"];
-                    userRole["status"] = (bool)res["active"] ? "active":"";
+                    userRole["status"] = res["active"]!=null ? "active":"";
 
                     roles.Add(userRole);
                 }
