@@ -21,14 +21,20 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
             HTTPrequest = new HTTPrequest();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="personUser"></param>
+        /// <param name="loginData"></param>
+        /// <param name="token"></param>
+        /// <returns>Code 200 if register success. Code 422 if email exixts.</returns>
+
         public JObject Check(JObject personUser, JObject loginData, string token)
         {
             dynamic result = new JObject();
             if (personUser["resourceType"].ToString() == "Bundle" && personUser["total"].ToString() == "0")
             {
                 personUser = (JObject)personUser["entry"][0]["resource"];
-
-
 
             }
 
@@ -50,18 +56,14 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
                             loginData["person"]["name"] = personUser["name"][0]["text"] != null ? personUser["name"][0]["text"] : "";
                             loginData["person"]["email"] = personUser["identifier"][0] != null ? personUser["identifier"][0]["value"] : "";
 
-                            
-
                             result.code = 200;
                             return result;
                         }
                     }
                 }
             }
-            result.code = 401;
+            result.code = 422;  // Unprocessable Entity
             return result;
-        }
-
-      
+        }      
     }
 }

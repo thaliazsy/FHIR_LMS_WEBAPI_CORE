@@ -44,8 +44,8 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
                         {
                             //Email and password verified
                             loginData["person"]["id"] = personUser["id"] != null ? personUser["id"] : "";
-                            loginData["person"]["name"] = personUser["name"][0]["text"] != null ? personUser["name"][0]["text"] : "";
-                            loginData["person"]["email"] = personUser["identifier"][0] != null ? personUser["identifier"][0]["value"] : "";
+                            loginData["person"]["name"] = personUser["name"]!=null && personUser["name"][0]["text"] != null ? personUser["name"][0]["text"] : "";
+                            loginData["person"]["email"] = personUser["identifier"]!=null && personUser["identifier"][0] != null ? personUser["identifier"][0]["value"] : "";
 
                             result.roles = GetRoles(personUser, loginData);
 
@@ -74,13 +74,13 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
                 if (role["target"]["reference"].ToString().StartsWith("Patient/"))
                 {
                     JObject res = HTTPrequest.getResource(fhirUrl, "Patient", "/" + roleID, "", null, loginData);
-
+                    loginData["person"]["name"] = loginData["person"]["name"].ToString() == "" ? res["name"][0]["text"] : "";
                     userRole["roleName"] = res["resourceType"];
                     userRole["roleID"] = res["id"];
                     userRole["practID"] = "";
                     userRole["organizationID"] = res["managingOrganization"]["reference"].ToString().Split('/')[1];
                     userRole["organizationName"] = res["managingOrganization"]["display"] ?? res["managingOrganization"]["reference"];
-                    userRole["status"] = res["active"]!=null ? "active":"";
+                    userRole["status"] = res["active"] != null ? "active" : "";
 
                     roles.Add(userRole);
                 }
@@ -93,6 +93,8 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
                     JObject res = HTTPrequest.getResource(fhirUrl, "PractitionerRole", param, null, null, loginData);
 
                     JArray pracRoles = (JArray)res["entry"];
+
+                    loginData["person"]["name"] = loginData["person"]["name"].ToString() == "" ? pracRoles[0]["resource"]["name"][0]["text"] : "";
 
                     foreach (JObject pracRole in pracRoles)
                     {
