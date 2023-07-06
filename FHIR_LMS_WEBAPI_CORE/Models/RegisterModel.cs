@@ -53,7 +53,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
                         {
                             //Email and password verified
                             loginData["person"]["id"] = personUser["id"] != null ? personUser["id"] : "";
-                            loginData["person"]["name"] = personUser["name"][0]["text"] != null ? personUser["name"][0]["text"] : "";
+                            loginData["person"]["name"] = personUser["name"] != null && personUser["name"][0]["text"] != null ? personUser["name"][0]["text"] : "";
                             loginData["person"]["email"] = personUser["identifier"][0] != null ? personUser["identifier"][0]["value"] : "";
 
                             result.code = 200;
@@ -64,6 +64,6 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
             }
             result.code = 422;  // Unprocessable Entity
             return result;
-        }      
+        }
     }
 }
