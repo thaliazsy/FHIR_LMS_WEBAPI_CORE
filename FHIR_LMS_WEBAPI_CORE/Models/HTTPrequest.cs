@@ -142,7 +142,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
                 }
 
                 var response = (HttpWebResponse)requestHttp.GetResponse();
-                if (response.StatusCode == HttpStatusCode.OK)
+                if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.Created)
                 {
                     using (var streamReader = new StreamReader(response.GetResponseStream()))
                     {

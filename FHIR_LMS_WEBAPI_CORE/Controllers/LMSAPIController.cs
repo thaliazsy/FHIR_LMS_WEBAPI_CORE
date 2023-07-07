@@ -107,6 +107,14 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
             */
         }
 
+
+        /// <summary>
+        /// user.["Person"] = Person JSON obj
+        /// user.["Patient"] = Patient JSON obj
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns>{"patient": "Patient/[id]", "person": "Person/[id]}</returns>
+
         [HttpPost("api/register")]
         public IActionResult Register([FromBody] JObject user)
         {
@@ -124,8 +132,15 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
             JObject result = HTTPrequest.getResource(fhirUrl, "Person", param, "", null, loginData);
             if ((result["code"] != null && (int)result["code"] == 404) || ((string)result["resourceType"] == "Bundle" && (string)result["type"] == "searchset" && result["entry"] == null)) //Person not found
             {
+                // Generate UUID for Patient
+                Guid uuid = Guid.NewGuid();
+                string patientUUID = uuid.ToString();
+                patient["id"] = patientUUID;
+
+                // PUT Patient
+                JObject ret = HTTPrequest.putResource(fhirUrl, "Patient/" + patientUUID, patient, "", null, loginData);
                 //Post Patient
-                JObject ret = HTTPrequest.postResource(fhirUrl, "Patient", patient, "", null, loginData);
+                //JObject ret = HTTPrequest.postResource(fhirUrl, "Patient", patient, "", null, loginData);
                 if (ret["resourceType"] != null && ret["resourceType"].ToString() == "Patient")
                 {
                     //Get Patient ID
@@ -135,8 +150,12 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
                     //Store Patient ID
                     res.patient = "Patient/" + ret["id"].ToString();
 
+                    // Generate UUID for Person
+                    uuid = Guid.NewGuid();
+                    string personUUID = uuid.ToString();
+                    person["id"] = personUUID;
 
-                    ret = HTTPrequest.postResource(fhirUrl, "Person", person, "", null, loginData);
+                    ret = HTTPrequest.putResource(fhirUrl, "Person/" + personUUID, person, "", null, loginData);
 
                     if (ret["resourceType"] != null && ret["resourceType"].ToString() == "Person")
                     {
@@ -144,7 +163,12 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
                         return Ok(res);
                     }
                 }
+                else
+                {
+                    res.msg = "Register failed.";
 
+                    return Ok(res);
+                }
             }
             else
             {
