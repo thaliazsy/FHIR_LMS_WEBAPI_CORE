@@ -9,5 +9,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
     {
         public string patientId { get; set; }
         public string personId { get; set; }
+
+        public string scheduleId { get; set; }
     }
 }

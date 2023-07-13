@@ -44,15 +44,16 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
             //}
 
             // Get Person ID and Patient ID
-            if (user.personId == "" || user.patientId == "")
+            if (user.personId == "" || user.patientId == "" || user.scheduleId == "")
             {
-                return BadRequest("Patient or Person ID not found.");
+                return BadRequest("Patient ID or Person ID or Schedule ID not found.");
             }
 
             loginData["person"]["id"] = user.personId;
             loginData["patient"]["id"] = user.patientId;
-
+            
             loginData["schedule"]["id"] = "4534";
+            loginData["schedule"]["id"] = user.scheduleId;
 
             //Check Login Data (Person == Patient)
             loginData["errmsg"] = "Check Login Person failed.";

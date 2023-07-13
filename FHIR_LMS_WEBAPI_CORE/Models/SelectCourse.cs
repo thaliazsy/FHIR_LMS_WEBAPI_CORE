@@ -25,36 +25,38 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
         public JObject GetUserRole(JObject personUser, JObject loginData, string token)
         {
 
-            JObject result = null;
+            dynamic result = null;
             loginData["person"]["id"] = personUser["id"] != null ? personUser["id"] : "";
             loginData["person"]["name"] = personUser["name"][0]["text"] != null ? personUser["name"][0]["text"] : "";
             loginData["person"]["identifier"] = personUser["identifier"][0] != null ? personUser["identifier"][0]["value"] : "";
 
             if (personUser["link"] != null)
             {
-                JObject role = (JObject)personUser["link"][0];
-
-                string roleID = role["target"]["reference"].ToString();
-
-                string param = string.Empty;
-
-                if (roleID.Split('/')[0] == "Practitioner")
+                foreach(JObject role in (JArray)personUser["link"])
                 {
-                    param = "?practitioner=" + roleID.Split('/')[1];
-                    result = HTTPrequest.getResource(fhirUrl, "PractitionerRole", param, token, GetSchedule, loginData);
-                    return result;
-                }
-                else if (roleID.Split('/')[0] == "Patient")
-                {
-                    if (loginData["patient"]["id"].ToString() == roleID.Split('/')[1].ToString())
+                    string roleID = role["target"]["reference"].ToString();
+
+                    string param = string.Empty;
+
+                    if (roleID.Split('/')[0] == "Practitioner")
                     {
-                        loginData["errmsg"] = "GET Patient failed.";
-                        param = '/' + loginData["patient"]["id"].ToString();
-                        result = HTTPrequest.getResource(fhirUrl, "Patient", param, token, GetSchedule, loginData);
+                        param = "?practitioner=" + roleID.Split('/')[1];
+                        result = HTTPrequest.getResource(fhirUrl, "PractitionerRole", param, token, GetSchedule, loginData);
                         return result;
                     }
-                    result["message"] = "Patient does not belong to this Person.";
+                    else if (roleID.Split('/')[0] == "Patient")
+                    {
+                        if (loginData["patient"]["id"].ToString() == roleID.Split('/')[1].ToString())
+                        {
+                            loginData["errmsg"] = "GET Patient failed.";
+                            param = '/' + loginData["patient"]["id"].ToString();
+                            result = HTTPrequest.getResource(fhirUrl, "Patient", param, token, GetSchedule, loginData);
+                            return result;
+                        }
+                        
+                    }
                 }
+                result["message"] = "Patient does not belong to this Person.";
             }
             return result;
         }

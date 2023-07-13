@@ -94,7 +94,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
 
                     JArray pracRoles = (JArray)res["entry"];
 
-                    loginData["person"]["name"] = loginData["person"]["name"].ToString() == "" ? pracRoles[0]["resource"]["name"][0]["text"] : "";
+                    loginData["person"]["name"] = loginData["person"]["name"].ToString() == "" ? res["name"][0]["text"] : loginData["person"]["name"].ToString();
 
                     foreach (JObject pracRole in pracRoles)
                     {
