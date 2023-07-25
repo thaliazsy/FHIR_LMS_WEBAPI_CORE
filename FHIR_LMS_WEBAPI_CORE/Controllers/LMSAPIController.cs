@@ -247,12 +247,12 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
 
             if (data["viewer"].ToString() == "skinlesion.report.document")
             {
-                retData["viewerURL"] = "http://203.64.84.32:9876/viewer/skin-lesion-viewer";
+                retData["viewerURL"] = "http://repo.tcumi.com:9876/viewer/skin-lesion-viewer";
             }
             else if (data["viewer"].ToString() == "skinlesion.image.document")
             {
-                retData["viewerURL"] = "http://203.64.84.32:9876/skinlesionimage-ms/ReportCreator?documentbundle=" + docUrl;
-                //http://203.64.84.32:9876/ReportCreator?documentbundle=http://203.64.84.32:9876/fhir/Bundle/688
+                retData["viewerURL"] = "http://repo.tcumi.com:9876/skinlesionimage-ms/ReportCreator?documentbundle=" + docUrl;
+                //http://repo.tcumi.com:9876/ReportCreator?documentbundle=http://repo.tcumi.com:9876/fhir/Bundle/688
             }
             else
             {
@@ -263,7 +263,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
             retData["accessToken"] = allToken;
 
             //Return to viewer URL and access token to client
-            //string redirectUrl = "http://203.64.84.32:9876/viewer?wantedDoc=" + docUrl;
+            //string redirectUrl = "http://repo.tcumi.com:9876/viewer?wantedDoc=" + docUrl;
             //return RedirectPermanent(redirectUrl);
             return Ok(retData);
         }
