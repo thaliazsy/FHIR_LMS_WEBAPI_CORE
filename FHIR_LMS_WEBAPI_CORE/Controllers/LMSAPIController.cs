@@ -58,8 +58,11 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
             //Check Login Data (Person == Patient)
             loginData["errmsg"] = "Check Login Person failed.";
             string param = '/' + loginData["person"]["id"].ToString();
-            JObject result = HTTPrequest.getResource(fhirUrl, "Person", param, token, selectCourse.GetUserRole, loginData);
-
+            JObject result = HTTPrequest.getResource(fhirUrl, "Person", param, token, selectCourse.GetUserRole, loginData); // result = a new FHIR Appointment
+            if (result["errmsg"] != null)
+            {
+                return BadRequest(result);
+            }
             result = HTTPrequest.getResource(fhirUrl, "Appointment", "?actor=Patient/" + user.patientId, token, null, loginData);
 
             return Ok(result);

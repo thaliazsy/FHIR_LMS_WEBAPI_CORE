@@ -32,7 +32,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
 
             if (personUser["link"] != null)
             {
-                foreach(JObject role in (JArray)personUser["link"])
+                foreach (JObject role in (JArray)personUser["link"])
                 {
                     string roleID = role["target"]["reference"].ToString();
 
@@ -53,7 +53,6 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
                             result = HTTPrequest.getResource(fhirUrl, "Patient", param, token, GetSchedule, loginData);
                             return result;
                         }
-                        
                     }
                 }
                 result["message"] = "Patient does not belong to this Person.";
@@ -78,7 +77,31 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
             //GET SlotID
             loginData["errmsg"] = "GET Slot failed.";
             string param = "?schedule=" + loginData["schedule"]["id"];
-            JObject result = HTTPrequest.getResource(fhirUrl, "Slot", param, token, CreateAppointment, loginData);
+            JObject result = HTTPrequest.getResource(fhirUrl, "Slot", param, token, CheckAppointments, loginData);
+            return result;
+        }
+
+        public JObject CheckAppointments(JObject slot, JObject loginData, string token)
+        {
+            HTTPrequest HTTPrequest = new HTTPrequest();
+
+            loginData["slot"]["id"] = slot["entry"][0]["resource"]["id"];
+
+            //Check Appointments
+            loginData["errmsg"] = "GET Appointments failed.";
+            string param = "?slot=" + loginData["slot"]["id"].ToString() + "&patient=" + loginData["patient"]["id"].ToString();
+            JObject result = HTTPrequest.getResource(fhirUrl, "Appointment", param, token, null, loginData);
+
+            if ((string)result["resourceType"] == "Bundle" && (string)result["type"] == "searchset" && result["entry"] != null) //Person not found
+            {
+                JObject errmsg = new JObject();
+                errmsg["errmsg"] = "You have resgitered this course.";
+                return errmsg;
+            }
+            else
+            {
+                CreateAppointment(slot, loginData, token);
+            }
             return result;
         }
 
@@ -98,7 +121,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
             //POST new Appointment
             loginData["errmsg"] = "Create Appointment failed.";
             JObject result = HTTPrequest.postResource(fhirUrl, "Appointment", appointment, token, GetGroupQuantity, loginData);
-            
+
             return result;
         }
 
