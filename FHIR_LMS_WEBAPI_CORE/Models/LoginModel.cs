@@ -104,11 +104,14 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
                         userRole["organizationID"] = pracRole["resource"]["organization"]["reference"].ToString().Split('/')[1];
                         userRole["organizationName"] = pracRole["resource"]["organization"]["display"];
                         userRole["status"] = (bool)pracRole["resource"]["active"] ? "active" : "";
-
-                        foreach (JObject coding in pracRole["resource"]["code"][0]["coding"])
+                        if (pracRole["resource"]["code"]!=null)
                         {
-                            userRole["roleCode"].ToList().Add(coding["code"]);
+                            foreach (JObject coding in pracRole["resource"]["code"][0]["coding"])
+                            {
+                                userRole["roleCode"].ToList().Add(coding["code"]);
+                            }
                         }
+
 
                         roles.Add(userRole);
                     }
