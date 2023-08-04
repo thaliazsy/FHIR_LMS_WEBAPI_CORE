@@ -73,6 +73,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
         {
 
             loginData["schedule"]["courseCode"] = schedule["specialty"][0]["coding"][0]["code"].ToString();
+            loginData["schedule"]["name"] = schedule["name"];
 
             //GET SlotID
             loginData["errmsg"] = "GET Slot failed.";

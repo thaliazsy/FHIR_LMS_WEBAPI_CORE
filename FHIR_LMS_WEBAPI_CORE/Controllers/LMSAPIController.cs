@@ -5,8 +5,10 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Net.Mail;
 using System.Threading.Tasks;
 
 namespace FHIR_LMS_WEBAPI_CORE.Controllers
@@ -28,6 +30,40 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
         //{
         //    return View();
         //}
+
+        private void SendEmail(string Mail, string Subject, string Body)
+        {
+
+            MailMessage msg = new MailMessage();
+            //收件者，以逗號分隔不同收件者 ex "test@gmail.com,test2@gmail.com"
+            //msg.To.Add(string.Join(",", MailList.ToArray()));
+
+            msg.To.Add(Mail);
+            msg.From = new MailAddress("tcumih707@gmail.com", "TCUMI", System.Text.Encoding.UTF8);
+            //郵件標題 
+            msg.Subject = Subject;
+            //郵件標題編碼  
+            msg.SubjectEncoding = System.Text.Encoding.UTF8;
+            //郵件內容
+            msg.Body = Body;
+            msg.IsBodyHtml = true;
+            msg.BodyEncoding = System.Text.Encoding.UTF8;//郵件內容編碼 
+            msg.Priority = MailPriority.Normal;//郵件優先級 
+                                               //建立 SmtpClient 物件 並設定 Gmail的smtp主機及Port 
+            #region 其它 Host
+            /*
+             *  outlook.com smtp.live.com port:25
+             *  yahoo smtp.mail.yahoo.com.tw port:465
+            */
+            #endregion
+            SmtpClient MySmtp = new SmtpClient("smtp.gmail.com", 587);
+            //設定你的帳號密碼
+            MySmtp.Credentials = new System.Net.NetworkCredential("tcumih707@gmail.com", "wixatbyfyxsasxud");
+            //Gmial 的 smtp 使用 SSL
+            MySmtp.EnableSsl = true;
+            MySmtp.Send(msg);
+
+        }
 
         [HttpPost("api/select-course")]
         public IActionResult SelectCourse([FromBody] UserLogin user)
@@ -51,8 +87,8 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
 
             loginData["person"]["id"] = user.personId;
             loginData["patient"]["id"] = user.patientId;
-            
-            loginData["schedule"]["id"] = "4534";
+
+            //loginData["schedule"]["id"] = "4534";
             loginData["schedule"]["id"] = user.scheduleId;
 
             //Check Login Data (Person == Patient)
@@ -63,7 +99,20 @@ namespace FHIR_LMS_WEBAPI_CORE.Controllers
             {
                 return BadRequest(result);
             }
-            result = HTTPrequest.getResource(fhirUrl, "Appointment", "?actor=Patient/" + user.patientId, token, null, loginData);
+
+            //Send Email
+
+            string FilePath = Directory.GetCurrentDirectory() + "\\Assets\\HTML\\ThankyouPage.html";
+            StreamReader str = new StreamReader(FilePath);
+            string MailText = str.ReadToEnd();
+            str.Close();
+
+            string mail = loginData["person"]["identifier"].ToString();
+            string subject = "感謝您報名 【"+ loginData["schedule"]["name"].ToString() + "】";
+
+            SendEmail(mail, subject, MailText);
+
+            result = HTTPrequest.getResource(fhirUrl, "Appointment", "?actor=Patient/" + user.patientId, token, null, loginData);   // return all appointments
 
             return Ok(result);
         }
