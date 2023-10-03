@@ -24,7 +24,7 @@ namespace FHIR_LMS_WEBAPI_CORE.Models
         public JObject Check(JObject personUser, JObject loginData, string token)
         {
             dynamic result = new JObject();
-            if (personUser["resourceType"].ToString() == "Bundle" && personUser["total"].ToString() == "1")
+            if (personUser["resourceType"].ToString() == "Bundle" && ((JArray)personUser["entry"]).Count == 1)
             {
                 personUser = (JObject)personUser["entry"][0]["resource"];
             }
